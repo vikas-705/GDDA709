@@ -22,3 +22,4 @@ public class TemperatureMapper extends Mapper<LongWritable, Text, Text, IntWrita
         }
     }
 }
+

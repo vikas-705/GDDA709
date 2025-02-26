@@ -1,0 +1,47 @@
+version: "3"
+services:
+  namenode:
+    image: bde2020/hadoop-namenode:latest
+    container_name: namenode
+    environment:
+      - CLUSTER_NAME=test-cluster
+    ports:
+      - "9870:9870"
+      - "9000:9000"
+    volumes:
+      - namenode_data:/hadoop/dfs/name
+  
+  datanode:
+    image: bde2020/hadoop-datanode:latest
+    container_name: datanode
+    environment:
+      - SERVICE_PRECONDITION=namenode:9000
+    ports:
+      - "9864:9864"
+    volumes:
+      - datanode_data:/hadoop/dfs/data
+
+  resourcemanager:
+    image: bde2020/hadoop-resourcemanager:latest
+    container_name: resourcemanager
+    environment:
+      - SERVICE_PRECONDITION=namenode:9000 datanode:9864
+
+  nodemanager:
+    image: bde2020/hadoop-nodemanager:latest
+    container_name: nodemanager
+    environment:
+      - SERVICE_PRECONDITION=resourcemanager:8088 namenode:9000
+
+  historyserver:
+    image: bde2020/hadoop-historyserver:latest
+    container_name: historyserver
+    environment:
+      - SERVICE_PRECONDITION=namenode:9000 resourcemanager:8088
+    volumes:
+      - historyserver_data:/hadoop/yarn/timeline
+  
+volumes:
+  namenode_data:
+  datanode_data:
+  historyserver_data:
